@@ -29,6 +29,7 @@ pub struct FullTrack {
     pub id: Option<TrackId<'static>>,
     pub is_local: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub is_playable: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub linked_from: Option<TrackLink>,

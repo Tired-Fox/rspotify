@@ -1056,16 +1056,18 @@ where
         playlist_id: PlaylistId<'a>,
         fields: Option<&'a str>,
         market: Option<Market>,
+        additional_types: Option<&'a [AdditionalType]>,
     ) -> Paginator<'_, ClientResult<PlaylistItem>> {
         paginate_with_ctx(
-            (self, playlist_id, fields),
-            move |(slf, playlist_id, fields), limit, offset| {
+            (self, playlist_id, fields, additional_types),
+            move |(slf, playlist_id, fields, additional_types), limit, offset| {
                 slf.playlist_items_manual(
                     playlist_id.as_ref(),
                     *fields,
                     market,
                     Some(limit),
                     Some(offset),
+                    *additional_types
                 )
             },
             self.get_config().pagination_chunks,
@@ -1080,14 +1082,23 @@ where
         market: Option<Market>,
         limit: Option<u32>,
         offset: Option<u32>,
+        additional_types: Option<&'_ [AdditionalType]>,
     ) -> ClientResult<Page<PlaylistItem>> {
         let limit = limit.map(|s| s.to_string());
         let offset = offset.map(|s| s.to_string());
+        let additional_types = additional_types.map(|x| {
+            x.iter()
+                .map(Into::into)
+                .collect::<Vec<&'static str>>()
+                .join(",")
+        });
+
         let params = build_map([
             ("fields", fields),
             ("market", market.map(Into::into)),
             ("limit", limit.as_deref()),
             ("offset", offset.as_deref()),
+            ("additional_types", additional_types.as_deref()),
         ]);
 
         let url = format!("playlists/{}/tracks", playlist_id.id());

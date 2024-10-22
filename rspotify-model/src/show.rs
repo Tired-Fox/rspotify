@@ -103,7 +103,8 @@ pub struct FullEpisode {
     pub id: EpisodeId<'static>,
     pub images: Vec<Image>,
     pub is_externally_hosted: bool,
-    pub is_playable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_playable: Option<bool>,
     #[deprecated(note = "This `language` field is deprecated and might be \
         removed in the future by Spotify. Please use the languages field \
         instead")]
